@@ -37,7 +37,19 @@ The same models on the previous build (oneAPI 2025.2) ran at 1,300 / 1,093 / 2,3
 - The GPU's render node passed into the container, for example `/dev/dri/renderD128`.
 - Your host's `render` group ID; it's `18` on Unraid. Check yours with `getent group render`.
 
+## Get the image
+
+A prebuilt image is published to GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/dkirk25/ollama-intel-sycl:0.40.16
+```
+
+`latest` points to the newest release.
+
 ## Build
+
+To build it yourself:
 
 ```bash
 docker build -t ollama-intel-sycl:0.40.16 .
@@ -65,14 +77,14 @@ docker run -d --name ollama-intel-sycl \
   -v /path/to/ollama/cache:/root/.cache \
   -e OLLAMA_FLASH_ATTENTION=true \
   -e OLLAMA_KV_CACHE_TYPE=q8_0 \
-  ollama-intel-sycl:0.40.16
+  ghcr.io/dkirk25/ollama-intel-sycl:0.40.16
 ```
 
 Mount `/root/.cache` to a persistent folder. The Intel driver saves compiled GPU kernels there. With the folder persisted, only the **first** load of each model takes about 60 s while kernels compile, and later loads take a few seconds.
 
 ### Unraid
 
-1. Add a container with **Repository** set to your image tag.
+1. Add a container with **Repository** set to `ghcr.io/dkirk25/ollama-intel-sycl:0.40.16`. Unraid then shows **up-to-date** or **update ready** for it.
 2. Set **Extra Parameters** to `--device=/dev/dri/renderD128 --group-add 18`.
 3. Add path mappings for `/root/.ollama` (models) and `/root/.cache` (kernel cache).
 4. Add the environment variables from the table below.
@@ -134,7 +146,16 @@ Mount `/root/.cache` to a persistent folder. The Intel driver saves compiled GPU
    - A model loads with `offloaded N/N layers to GPU`.
    - A generation succeeds.
    - Several unload→reload cycles complete without hanging.
-4. Deploy.
+4. Push both the version tag and `latest`.
+5. Deploy.
+
+> **Publishing from Docker Desktop:** when Docker Desktop's containerd image store is on, `docker push` uploads a single OCI image manifest. Unraid's update check doesn't request that format, so the Docker tab shows *not available*. After pushing, wrap each tag in an OCI index:
+>
+> ```bash
+> crane index append -m ghcr.io/dkirk25/ollama-intel-sycl@<digest> -t ghcr.io/dkirk25/ollama-intel-sycl:<tag>
+> ```
+>
+> Get `<digest>` with `crane digest ghcr.io/dkirk25/ollama-intel-sycl:<tag>`. Pushing from Docker's classic image store avoids the problem.
 
 ## Troubleshooting
 

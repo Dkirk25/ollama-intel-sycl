@@ -127,6 +127,11 @@ ENV SYCL_PI_LEVEL_ZERO_USE_IMMEDIATE_COMMANDLISTS=1
 ENV UR_L0_USE_IMMEDIATE_COMMANDLISTS=1
 ENV no_proxy=localhost,127.0.0.1
 
+LABEL org.opencontainers.image.source="https://github.com/Dkirk25/ollama-intel-sycl" \
+      org.opencontainers.image.description="Ollama on Intel Arc GPUs via the SYCL/oneAPI backend" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.version="${OLLAMA_VERSION}"
+
 EXPOSE 11434
 
 VOLUME ["/root/.ollama"]
