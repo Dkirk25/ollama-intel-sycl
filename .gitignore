@@ -1,0 +1,23 @@
+# AI assistant tooling
+.claude/
+CLAUDE.md
+*claude*
+
+# Exported images and build output
+*.tar
+*.tar.gz
+*.tar.zst
+*.log
+dist/
+build/
+
+# Backups
+*.bak
+*.bak-*
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
